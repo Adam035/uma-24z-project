@@ -1,7 +1,6 @@
 init:
 	python -m venv venv
-	.\venv\Scripts\activate
-	pip install -r requirements.txt
+	.\venv\Scripts\activate && pip install -r requirements.txt
 
 run:
-	python main.py
+	.\venv\Scripts\activate && python main.py
