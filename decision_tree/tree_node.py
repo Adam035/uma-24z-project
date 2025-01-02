@@ -22,6 +22,33 @@ class TreeNode:
                     return label
                 break
 
+    def __str__(self, level=0, is_last=True, branches=None) -> str:
+        if branches is None:
+            branches = [False]
+        result = ""
+        for branch in branches:
+            result += "│  " if branch else "   "
+        result += "└" if is_last else "├"
+        if result[-1] == "└":
+            branches.append(False)
+        elif result[-1] == "├":
+            branches.append(True)
+        result += "──"
+        if self.label != "":
+            result += f" {self.label}"
+            branches.pop()
+            if is_last:
+                while branches and not branches[-1]:
+                    branches.pop()
+                if branches and branches[-1]:
+                    branches.pop()
+        else:
+            result += "┐"
+        result += f" {self.attribute} ({self.min_value}, {self.max_value})\n"
+        for i, leaf in enumerate(self.leaves):
+            result += leaf.__str__(level + 1, is_last=(i == len(self.leaves) - 1), branches=branches)
+        return result
+
 def same_label(samples: DataFrame) -> bool:
     return len(samples.iloc[:, -1].unique()) == 1
 
