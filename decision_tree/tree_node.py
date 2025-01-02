@@ -62,7 +62,7 @@ def most_common_label(samples: DataFrame) -> str:
 def attribute_selection(attributes: list[str]) -> str:
     return attributes[0]
 
-def generate_tree(samples: DataFrame, attributes: list[str], split_method, min_value: float = 0, max_value: float = 0) -> TreeNode:
+def generate_tree(samples: DataFrame, attributes: list[str], split_method, num_splits: int = 2, min_value = float("-inf"), max_value = float("inf")) -> TreeNode:
     node = TreeNode(min_value, max_value)
 
     if same_label(samples):
@@ -75,10 +75,10 @@ def generate_tree(samples: DataFrame, attributes: list[str], split_method, min_v
 
     best_attr = attribute_selection(attributes)
     node.attribute = best_attr
-    subsets = split_method(samples, best_attr)
+    subsets = split_method(samples, best_attr, num_splits)
 
     new_attributes = [attr for attr in attributes if attr != best_attr]
     for subset, range_values in subsets:
-        node.add_leaf(generate_tree(subset, new_attributes, split_method, range_values[0], range_values[1]))
+        node.add_leaf(generate_tree(subset, new_attributes, split_method, num_splits, range_values[0], range_values[1]))
 
     return node
