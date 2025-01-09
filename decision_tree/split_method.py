@@ -21,7 +21,6 @@ def quantile_split(samples: DataFrame, attribute: str, num_splits: int = 4) -> l
 
 
 def entropy(samples:DataFrame) -> float:
-    attributes = [i for i in samples.columns]
     classes = samples.iloc[:,-1].value_counts()
     samples_count = samples.shape[0]
     entropy = 0
@@ -30,23 +29,30 @@ def entropy(samples:DataFrame) -> float:
         entropy -= p*math.log(p,2)
     return entropy
         
+def gini(samples:DataFrame) -> float:
+    classes = samples.iloc[:,-1].value_counts()
+    samples_count = samples.shape[0]
+    gini = 1
+    for _, class_count in classes.items():
+        p = class_count/samples_count 
+        gini -= p*p
+    return gini
 
-
-def attribute_selection(samples: DataFrame, split_func):
+def attribute_selection(samples: DataFrame, split_func, index_func=entropy):
     attributes = [i for i in samples.columns][:-1]
     
     whole_set_count = samples.shape[0]
-    whole_set_entropy = entropy(samples)
+    whole_set_index = index_func(samples)
     
     information_gain: dict = {}
     for attr in attributes:
-        subsets = split_func(samples, attr)
-        entropy_after_division = 0
+        subsets = split_func(samples, attr, num_splits=4)
+        index_after_division = 0
         for subset in subsets:
             samples_count = subset[0].shape[0]
-            subset_entropy = entropy(subset[0])
-            entropy_after_division += samples_count/whole_set_count * subset_entropy
-        inf_gain_attr = whole_set_entropy - entropy_after_division
+            subset_index = index_func(subset[0])
+            index_after_division += samples_count/whole_set_count * subset_index
+        inf_gain_attr = whole_set_index - index_after_division
         information_gain[attr] = inf_gain_attr
     max_inf_gain = max(information_gain, key=information_gain.get)
     return max_inf_gain
@@ -61,4 +67,5 @@ if __name__ == '__main__':
         "Income": [30, 40, 60, 60, 70, 80],
         "Class": ["Tak", "Tak", "Nie", "Tak", "Nie", "Nie"]
     })
-    print(attribute_selection(samples_cont, median_split))
+    #print(gini(samples))
+    print(attribute_selection(samples_cont, quantile_split, gini))
