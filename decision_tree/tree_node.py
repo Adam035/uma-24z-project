@@ -1,5 +1,7 @@
 from collections import Counter
 from pandas import DataFrame
+from .split_method import attribute_selection
+
 
 class TreeNode:
     def __init__(self, min_value: float, max_value: float):
@@ -21,6 +23,7 @@ class TreeNode:
                 if label:
                     return label
                 break
+        return ""
 
     def __str__(self, level=0, is_last=True, branches=None) -> str:
         if branches is None:
@@ -59,26 +62,23 @@ def most_common_label(samples: DataFrame) -> str:
     label = samples.iloc[:, -1]
     return Counter(label).most_common(1)[0][0]
 
-def attribute_selection(attributes: list[str]) -> str:
-    return attributes[0]
-
-def generate_tree(samples: DataFrame, attributes: list[str], split_method, num_splits: int = 2, min_value = float("-inf"), max_value = float("inf")) -> TreeNode:
+def generate_tree(samples: DataFrame, attributes: list[str], split_method, num_splits: int = 2, min_value = float("-inf"), max_value = float("inf"), max_depth: int = float("inf"), _depth: int = 0) -> TreeNode:
     node = TreeNode(min_value, max_value)
-
+    _depth += 1
     if same_label(samples):
         node.label = samples.iloc[0, -1]
         return node
 
-    if len(attributes) == 0 or all_same(samples):
+    if len(attributes) == 0 or all_same(samples) or _depth == max_depth:
         node.label = most_common_label(samples)
         return node
 
-    best_attr = attribute_selection(attributes)
+    best_attr = attribute_selection(samples, attributes)
     node.attribute = best_attr
     subsets = split_method(samples, best_attr, num_splits)
 
     new_attributes = [attr for attr in attributes if attr != best_attr]
     for subset, range_values in subsets:
-        node.add_leaf(generate_tree(subset, new_attributes, split_method, num_splits, range_values[0], range_values[1]))
+        node.add_leaf(generate_tree(subset, new_attributes, split_method, num_splits, range_values[0], range_values[1], max_depth, _depth))
 
     return node
