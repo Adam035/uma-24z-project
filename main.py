@@ -25,7 +25,8 @@ if __name__ == "__main__":
 
     train, test = train_test_split(df, test_size=0.3, random_state=42)
 
-    tree = generate_tree(train, inputs, quantile_split, num_splits=5, max_depth=5)
+    tree = generate_tree(train, inputs, split, num_splits=5, max_depth=5)
+    tree.merge()
     print(tree)
 
     calculate_accuracy(train, labels)
