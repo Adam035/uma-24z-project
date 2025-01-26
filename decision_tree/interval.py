@@ -1,3 +1,12 @@
+"""
+Module Name: interval.py
+Description: Klasa reprezentująca przedział liczbowy.
+Authors: Adam Lipian, Mateusz Gawlik
+Last Modified: 2025-01-25
+Version: 1.0
+"""
+
+
 class Interval:
     def __init__(self, min_value: float, max_value: float):
         self.intervals = [[min_value, max_value]]
@@ -22,7 +31,6 @@ class Interval:
                 current_start, current_end = start, end
 
         merged_intervals.append([current_start, current_end])
-
         result = Interval(0, 0)
         result.intervals = merged_intervals
         return result

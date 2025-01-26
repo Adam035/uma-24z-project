@@ -1,7 +1,17 @@
+"""
+Module Name: read_data.py
+Description: Moduł do wczytywania danych z pliku DAT.
+Authors: Adam Lipian, Mateusz Gawlik
+Last Modified: 2025-01-25
+Version: 1.0
+"""
+
 import re
 import pandas as pd
 
+
 def read_keel_file(file_path):
+    """Odczyt pliku DAT"""
     with open(file_path, 'r') as file:
         lines = file.readlines()
     data_start = None
