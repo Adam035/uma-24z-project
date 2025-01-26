@@ -2,7 +2,7 @@
 Module Name: decision_tree.py
 Description: Główny plik uruchomieniowy.
 Authors: Adam Lipian, Mateusz Gawlik
-Last Modified: 2025-01-25
+Last Modified: 2025-01-26
 Version: 1.0
 """
 
@@ -14,7 +14,7 @@ import numpy as np
 import click
 
 
-def calculate_accuracy(tree: TreeNode, samples: DataFrame, labels: list[str]) -> None:
+def calculate_accuracy_and_precision(tree: TreeNode, samples: DataFrame, labels: list[str]) -> None:
     """Oblicza dokładność i wyświetla tablicę kontyngencji"""
     predicted = samples.apply(tree.classify, axis=1)
     conf_matrix = confusion_matrix(samples.iloc[:, -1], predicted, labels=labels)
@@ -24,9 +24,22 @@ def calculate_accuracy(tree: TreeNode, samples: DataFrame, labels: list[str]) ->
 
     correct = np.trace(conf_matrix)
     total = np.sum(conf_matrix)
-    accuracy = 100 * correct / total
+    accuracy = round(100 * correct / total, 2)
+    print(f"Accuracy: {accuracy}%")
 
-    print(f"Accuracy: {accuracy}%", end=" ")
+    precisions = []
+    for i, label in enumerate(labels):
+        TP = conf_matrix[i, i]
+        FP = sum(conf_matrix[:, i]) - TP
+        if TP + FP > 0:
+            precision = TP / (TP + FP)
+        else:
+            precision = 0.0
+        precisions.append((label, round(precision, 2)))
+
+    print("Precision:")
+    for label, precision in precisions:
+        print(f"{label}: {100 * precision}%")
 
 
 @click.command()
@@ -53,9 +66,7 @@ def main(file_path, test_size, random_state, num_splits, max_depth, split_method
     tree.merge()
     print(tree)
 
-    calculate_accuracy(tree, train, labels)
-    print("(Train Set)", end="\n\n")
-    calculate_accuracy(tree, test, labels)
+    calculate_accuracy_and_precision(tree, test, labels)
     print("(Test Set)")
 
 
