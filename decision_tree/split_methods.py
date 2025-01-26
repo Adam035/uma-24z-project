@@ -14,7 +14,7 @@ import math
 from decision_tree.interval import Interval
 
 
-def equal_split(samples: pd.DataFrame, attribute: str, num_splits: int = 4) -> list[float]:
+def equal_split(samples: pd.DataFrame, attribute: str, num_splits: int = 2) -> list[float]:
     """Dzieli wartości atrybutu na równe przedziały według kwantyli."""
     quantiles = [i / num_splits for i in range(num_splits + 1)]
     thresholds = samples[attribute].quantile(q=quantiles).values.tolist()
@@ -52,7 +52,7 @@ def _conditional_entropy(samples, attribute, threshold):
     return cond_entropy
 
 
-def entropy_split(samples, attribute, num_splits):
+def entropy_split(samples, attribute, num_splits = 2):
     """Wybiera najlepsze progi, ze względu na entropię"""
     min_value, max_value = samples[attribute].min(), samples[attribute].max()
     interval_size = (max_value - min_value) / (num_splits + 1)
@@ -99,7 +99,7 @@ def _conditional_gini(samples, attribute, threshold):
     return cond_gini
 
 
-def gini_split(samples, attribute, num_splits):
+def gini_split(samples, attribute, num_splits = 2):
     """Wybiera najlepsze progi, ze względu na entropię"""
     min_value, max_value = samples[attribute].min(), samples[attribute].max()
     interval_size = (max_value - min_value) / (num_splits + 1)
