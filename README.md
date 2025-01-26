@@ -1,4 +1,4 @@
-# Decision Tree with Split Method Selection
+# Decision tree for continuous attributes
 
 ## Installation
 
